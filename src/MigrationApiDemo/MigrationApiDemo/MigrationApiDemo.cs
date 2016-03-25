@@ -52,7 +52,7 @@ namespace MigrationApiDemo
             _filesToMigrate = _testDataProvider.ProvisionAndGetFiles();
         }
 
-        public void CreateMigrationPackage()
+        public void CreateAndUploadMigrationPackage()
         {
             if (!_filesToMigrate.Any()) throw new Exception("No files to create Migration Package for, run ProvisionTestFiles() first!");
 
@@ -72,8 +72,16 @@ namespace MigrationApiDemo
         public Guid StartMigrationJob()
         {
             var sourceFileContainerUrl = _testDataProvider.GetBlobUri();
-            var manifestContainerUrl = _blobContainingManifestFiles.GetUri(SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.List);
-            var azureQueueReportUrl = _migrationApiQueue.GetUri(SharedAccessQueuePermissions.Read | SharedAccessQueuePermissions.Add | SharedAccessQueuePermissions.Update | SharedAccessQueuePermissions.ProcessMessages);
+            var manifestContainerUrl = _blobContainingManifestFiles.GetUri(
+                SharedAccessBlobPermissions.Read 
+                | SharedAccessBlobPermissions.Write 
+                | SharedAccessBlobPermissions.List);
+
+            var azureQueueReportUrl = _migrationApiQueue.GetUri(
+                SharedAccessQueuePermissions.Read 
+                | SharedAccessQueuePermissions.Add 
+                | SharedAccessQueuePermissions.Update 
+                | SharedAccessQueuePermissions.ProcessMessages);
 
             return _target.StartMigrationJob(sourceFileContainerUrl, manifestContainerUrl, azureQueueReportUrl);
         }
@@ -105,7 +113,7 @@ namespace MigrationApiDemo
                 {
                     case "JobEnd":
                         Log.Info($"Migration Job Ended {message.FilesCreated:0.} files created, {message.TotalErrors:0.} errors.!");
-                        DownloadAndPersistLogFiles( jobId);
+                        DownloadAndPersistLogFiles(jobId); // save log files to disk
                         Console.WriteLine("Press ctrl+c to exit");
                         return;
                     case "JobStart":

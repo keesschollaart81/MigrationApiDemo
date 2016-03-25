@@ -8,16 +8,16 @@ namespace MigrationApiDemo
         {
             var migrationApiDemo = new MigrationApiDemo();
 
-            // Step 1, create some test files and upload them to a Azure Storage Container
+            // Step 1, Create and upload some test-files to Azure Blob Storage
             migrationApiDemo.ProvisionTestFiles();
 
-            // Step 2, create a Migration Package with the job Manifest
-            migrationApiDemo.CreateMigrationPackage();
+            // Step 2, Create and upload Manifest Package to Azure Blob Storage
+            migrationApiDemo.CreateAndUploadMigrationPackage();
 
-            // Step 3, tell SharePoint where to find the files and start the migration job
+            // Step 3, Start the Migration Job using SharePoint Online Clientside Object Model (CSOM)
             var jobId = migrationApiDemo.StartMigrationJob();
 
-            // Step 4, wait for job to complete, persist logs
+            // Step 4, Monitor the Reporting Queue, persist messages/logs and wait for the job to complete
             migrationApiDemo.MonitorMigrationApiQueue(jobId).Wait();
 
             Console.ReadLine();
